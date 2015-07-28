@@ -12,6 +12,8 @@ import MapKit
 class ParseClient: NSObject {
     
     //constants
+    let PARSE_APP_ID = "QrX47CA9cyuGewLdsL7o5Eb8iug6Em8ye0dnAbIr"
+    let PARSE_REST_API_KEY = "QuWThTdiRmTux3YaDseUSEpUKo7aBYM737yKd4gY"
     let PARSE_REQUEST_LIMIT = 100
     
     //store parsed data as arrays of structs/objects
@@ -33,7 +35,7 @@ class ParseClient: NSObject {
         HttpHelper.makeHttpRequest(
             requestUrl: "https://api.parse.com/1/classes/StudentLocation",
             requestMethod: "POST",
-            requestAddValues: [("QrX47CA9cyuGewLdsL7o5Eb8iug6Em8ye0dnAbIr", "X-Parse-Application-Id"), ("QuWThTdiRmTux3YaDseUSEpUKo7aBYM737yKd4gY", "X-Parse-REST-API-Key"), ("application/json", "Content-Type")],
+            requestAddValues: [(PARSE_APP_ID, "X-Parse-Application-Id"), (PARSE_REST_API_KEY, "X-Parse-REST-API-Key"), ("application/json", "Content-Type")],
             requestBody: "{\"uniqueKey\": \"\(studentInfo.uniqueKey)\", \"firstName\": \"\(studentInfo.firstName)\", \"lastName\": \"\(studentInfo.lastName)\",\"mapString\": \"\(studentInfo.mapString)\", \"mediaURL\": \"\(studentInfo.mediaUrl)\",\"latitude\": \(studentInfo.latitude), \"longitude\": \(studentInfo.longitude)}".dataUsingEncoding(NSUTF8StringEncoding),
             requestDataHandler: { data, response, error in
                 
@@ -63,7 +65,7 @@ class ParseClient: NSObject {
         HttpHelper.makeHttpRequest(
             requestUrl: "https://api.parse.com/1/classes/StudentLocation?limit=\(PARSE_REQUEST_LIMIT)",
             requestMethod: "GET",
-            requestAddValues: [("QrX47CA9cyuGewLdsL7o5Eb8iug6Em8ye0dnAbIr", "X-Parse-Application-Id"), ("QuWThTdiRmTux3YaDseUSEpUKo7aBYM737yKd4gY", "X-Parse-REST-API-Key")],
+            requestAddValues: [(PARSE_APP_ID, "X-Parse-Application-Id"), (PARSE_REST_API_KEY, "X-Parse-REST-API-Key")],
             requestDataHandler: { data, response, error in
                 
                 //check for request error
