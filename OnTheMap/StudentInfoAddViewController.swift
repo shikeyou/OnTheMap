@@ -170,20 +170,14 @@ class StudentInfoAddViewController: UIViewController, UITextFieldDelegate, MKMap
     
     func findLocationOnMap(searchString: String) {
         
-        searchResults.removeAll()
-        
-        let request = MKLocalSearchRequest()
-        request.naturalLanguageQuery = searchString
-        
-        let search = MKLocalSearch(request: request)
-        
-        var annotations: [MKPointAnnotation] = []
+        //create a geocoder instance
+        let geocoder = CLGeocoder()
         
         //show activity indicator
         UiHelper.showActivityIndicator(view: self.view)
         
-        //start search
-        search.startWithCompletionHandler({ response, error in
+        //start forward geocoding
+        geocoder.geocodeAddressString(searchString, completionHandler: { placemarks, error in
             
             //hide activity indicator
             dispatch_async(dispatch_get_main_queue(), {
@@ -192,12 +186,22 @@ class StudentInfoAddViewController: UIViewController, UITextFieldDelegate, MKMap
             
             //check for search errors
             if error != nil {
-                UiHelper.showAlertAsync(view: self, title: "Search failed", msg: error.localizedDescription)
+                
+                //show custom error messages for those events that I have tested for
+                if error.domain == "kCLErrorDomain" && error.code == 8 {
+                    UiHelper.showAlertAsync(view: self, title: "Search failed", msg: "No matches found")
+                } else if error.domain == "kCLErrorDomain" && error.code == 2 {
+                    UiHelper.showAlertAsync(view: self, title: "Search failed", msg: "No internet connection")
+                } else {
+                    //show the generic error message
+                    UiHelper.showAlertAsync(view: self, title: "Search failed", msg: error.localizedDescription)
+                }
+                
                 return
             }
             
             //check if there are any results
-            if response.mapItems.count == 0 {
+            if placemarks.count == 0 {
                 UiHelper.showAlertAsync(view: self, title: "Search failed", msg: "No matches found")
                 return
             }
@@ -206,29 +210,32 @@ class StudentInfoAddViewController: UIViewController, UITextFieldDelegate, MKMap
             self.mapView.removeAnnotations(self.mapView.annotations)
             
             //loop through the results and mark them on the map
-            for item in response.mapItems as! [MKMapItem] {
+            var annotations: [MKPointAnnotation] = []
+            for placemark in placemarks {
                 
-                self.searchResults.append(item as MKMapItem)
+                let p = placemark as! CLPlacemark
                 
                 var annotation = MKPointAnnotation()
-                annotation.coordinate = item.placemark.coordinate
-                annotation.title = item.name
+                annotation.coordinate = p.location.coordinate
+                annotation.title = p.name
                 annotations.append(annotation)
+                
             }
             
-            //if there's only one result, set result automatically without user selecting
-            if response.mapItems.count == 1 {
-                let item = response.mapItems[0] as! MKMapItem
-                let coordinate = item.placemark.coordinate
-                self.setSelectedMapItem(name: item.name, latitude: Float(coordinate.latitude), longitude: Float(coordinate.longitude))
+            //if there's only one result, set selection automatically without user manually selecting
+            if placemarks.count == 1 {
+                let placemark = placemarks[0] as! CLPlacemark
+                let coordinate = placemark.location.coordinate
+                self.setSelectedMapItem(name: placemark.name, latitude: Float(coordinate.latitude), longitude: Float(coordinate.longitude))
             }
-            
+
             //update map ui
             dispatch_async(dispatch_get_main_queue(), {
                 self.mapView.showAnnotations(annotations, animated: true)
             })
             
         })
+        
     }
     
     func performSubmit() {
@@ -245,16 +252,16 @@ class StudentInfoAddViewController: UIViewController, UITextFieldDelegate, MKMap
             UiHelper.showAlert(view: self, title: "Error", msg: "Please enter a website URL")
             return
         }
-        let enteredUrl = NSURL(string: enteredUrlText)!
-        if !UIApplication.sharedApplication().canOpenURL(enteredUrl) {
+        let enteredUrl = NSURL(string: enteredUrlText)
+        if enteredUrl == nil || !UIApplication.sharedApplication().canOpenURL(enteredUrl!){
             UiHelper.showAlert(view: self, title: "Error", msg: "Please enter a valid URL")
             return
         }
         
         //query for user name
         let uniqueKey = UdacityClient.sharedInstance().uniqueKey!
-        let userFirstName = "Ace" //UdacityClient.sharedInstance().firstName!
-        let userLastName = "Ventura" //UdacityClient.sharedInstance().lastName!
+        let userFirstName = UdacityClient.sharedInstance().firstName!
+        let userLastName = UdacityClient.sharedInstance().lastName!
         
         //create StudentInfo to prepare for posting
         let studentInfo = StudentInfo(
@@ -264,7 +271,7 @@ class StudentInfoAddViewController: UIViewController, UITextFieldDelegate, MKMap
             latitude: selectedLocationLatitude,
             longitude: selectedLocationLongitude,
             mapString: selectedLocationName,
-            mediaUrl: enteredUrl
+            mediaUrl: enteredUrlText
         )
         
         //show activity indicator

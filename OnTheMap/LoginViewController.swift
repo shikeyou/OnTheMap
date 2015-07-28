@@ -160,8 +160,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     func performSignup() {
         
         //open link in browser
-        let udacityUrl = NSURL(string: "www.udacity.com/account/auth#!/signup")!
-        HttpHelper.openUrl(udacityUrl)
+        HttpHelper.openUrl("https://www.udacity.com/account/auth#!/signup", view: self)
         
     }
     

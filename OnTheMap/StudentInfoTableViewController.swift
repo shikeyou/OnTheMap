@@ -60,7 +60,8 @@ class StudentInfoTableViewController: UITableViewController {
         let studentInfo = ParseClient.sharedInstance().studentInfos[indexPath.row]
         
         //open link in browser
-        HttpHelper.openUrl(studentInfo.mediaUrl)
+        HttpHelper.openUrl(studentInfo.mediaUrl, view: self)
+        
     }
 
     //================================================

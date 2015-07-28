@@ -29,9 +29,9 @@ class StudentInfoAnnotation: NSObject, MKAnnotation {
     convenience init(studentInfo: StudentInfo) {
         self.init(
             title: "\(studentInfo.firstName) \(studentInfo.lastName)",
-            subtitle: studentInfo.mediaUrl.absoluteString!,
+            subtitle: studentInfo.mediaUrl,
             coordinate: CLLocationCoordinate2D(latitude: CLLocationDegrees(studentInfo.latitude), longitude: CLLocationDegrees(studentInfo.longitude)),
-            mediaUrl: studentInfo.mediaUrl.absoluteString!
+            mediaUrl: studentInfo.mediaUrl
         )
     }
     

@@ -16,17 +16,17 @@ struct StudentInfo {
     var latitude: Float
     var longitude: Float
     var mapString: String  //text string used to search for this coordinate
-    var mediaUrl: NSURL
+    var mediaUrl: String
     
     //main initializer
-    init(uniqueKey: String, firstName: String, lastName: String, latitude: Float, longitude: Float, mapString: String, mediaUrl: NSURL!) {
+    init(uniqueKey: String, firstName: String, lastName: String, latitude: Float, longitude: Float, mapString: String, mediaUrl: String) {
         self.uniqueKey = uniqueKey
         self.firstName = firstName
         self.lastName = lastName
         self.latitude = latitude
         self.longitude = longitude
         self.mapString = mapString
-        self.mediaUrl = mediaUrl!
+        self.mediaUrl = mediaUrl
     }
     
     //initializer that takes in a dictionary obtained from parsing data obtained from server
@@ -34,7 +34,7 @@ struct StudentInfo {
         self.uniqueKey = dict["uniqueKey"] as! String
         self.firstName = dict["firstName"] as! String
         self.lastName = dict["lastName"] as! String
-        self.mediaUrl = NSURL(string: dict["mediaURL"] as! String)!
+        self.mediaUrl = dict["mediaURL"] as! String
         self.mapString = dict["mapString"] as! String
         self.latitude = dict["latitude"] as! Float
         self.longitude = dict["longitude"] as! Float

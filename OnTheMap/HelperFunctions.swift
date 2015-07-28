@@ -63,19 +63,28 @@ class HttpHelper {
         return (jsonData as! NSDictionary, parsingError)
     }
     
-    //method that opens URLs
-    class func openUrl(url: NSURL) {
+    //method that opens URLs in default browser
+    class func openUrl(url: String, view: UIViewController) {
         
-        //add http to start of url if it is not already there
-        var newUrl: NSURL = url
-        if let urlString = url.absoluteString {
-            if urlString.substringToIndex(advance(urlString.startIndex, 4)) != "http" {
-                newUrl = NSURL(string: "http://\(urlString)")!
-            }
+        //add http to start of url if it is not already there, otherwise the browser won't open the url
+        var newUrl = url
+        if url.substringToIndex(advance(url.startIndex, 4)) != "http" {
+            newUrl = "http://\(url)"
         }
         
-        //open the url with default browser
-        UIApplication.sharedApplication().openURL(newUrl)
+        //create NSURL
+        let nsurl = NSURL(string: newUrl)
+        if nsurl != nil {
+            
+            //open the url with default browser
+            UIApplication.sharedApplication().openURL(nsurl!)
+            
+        } else {  //happens when a malformed URL is given e.g. "test test"
+            
+            UiHelper.showAlert(view: view, title: "Open Url Failed", msg: "Malformed URL provided: \(url)")
+            
+        }
+        
     }
     
 }

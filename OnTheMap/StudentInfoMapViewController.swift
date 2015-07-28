@@ -73,7 +73,7 @@ class StudentInfoMapViewController: UIViewController, MKMapViewDelegate {
         let pin = view.annotation as! StudentInfoAnnotation
         
         //open link in browser
-        HttpHelper.openUrl(NSURL(string: pin.mediaUrl)!)
+        HttpHelper.openUrl(pin.mediaUrl, view: self)
         
     }
     
